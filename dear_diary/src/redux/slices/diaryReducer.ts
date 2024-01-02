@@ -30,11 +30,14 @@ const diarySlice = createSlice({
         },
         clearCurrentEntry(state){
             state.currentEntry = {title: "", description: "",user:""};
+        },
+        clearEntries(state){
+            state.entries = [];
         }
 
     }
 
 });
 
-export const {getEntry,getDiary,addEntry,updateCurrentEntry,clearCurrentEntry} = diarySlice.actions;
+export const {getEntry,getDiary,addEntry,updateCurrentEntry,clearCurrentEntry, clearEntries} = diarySlice.actions;
 export const diaryReducer = diarySlice.reducer;

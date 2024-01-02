@@ -9,16 +9,22 @@ function LayoutBackground({ children }: LayoutBackgroundProps) {
   return (
         <div className="layout_bg"
         style={{
-          backgroundImage: `url(${require('../../Public/BackgroundImage.png')})`,
+          backgroundImage: `url(${process.env.PUBLIC_URL}/BackgroundImage.png)`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           position:"relative",
-          backgroundAttachment: "fixed",
-          overflowY: "scroll",
-          height: "100vh",
+          minHeight: "100%",
+          overflow: "auto",
+          backgroundRepeat: "no-repeat",
+
         }}
        
-        >{children}</div>
+        >
+         <div style={{ minHeight: '100vh', overflow: 'auto' }}>
+        {children}
+      </div>
+        
+        </div>
   );
 }
 

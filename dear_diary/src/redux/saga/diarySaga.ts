@@ -1,20 +1,18 @@
 import {put, take,takeLatest,call,fork} from "redux-saga/effects"
 import { eventChannel } from 'redux-saga';
-import {diaryRef} from "../../firebase"
+import {diaryRef} from "../../utility/firebase"
 import { addDoc , query,where} from "firebase/firestore";
 import { onSnapshot ,QueryDocumentSnapshot} from "firebase/firestore";
 import { addEntry, getDiary, getEntry } from "../slices/diaryReducer";
-import { useSelector,useDispatch } from "react-redux";
-
-interface DiaryEntry {
-    title: string;
-    description: string;
-}
 
 function* addDiarySaga(action: any) {
+  try{
     const { title, description,user} = action.payload;
     yield addDoc(diaryRef, { title, description, user });
-
+  }
+  catch(error: any){
+    console.error('An error occurred:', error.message);
+  }
 }
 
 function createEventChannel(name: string) {
@@ -32,20 +30,23 @@ function createEventChannel(name: string) {
   }
   
   function* watchDiaryEntries(name: string):Generator<any, void, any>  {
-    const channel = yield call(createEventChannel, name);
-    while (true) {
-      const entries = yield take(channel);
-      yield put(getDiary(entries));
+    try{
+      const channel = yield call(createEventChannel, name);
+      while (true) {
+        const entries = yield take(channel);
+        yield put(getDiary(entries));
+      }
+    }
+    catch(error: any){
+      console.error('An error occurred:', error.message);
     }
   }
   
   function* getDiarySaga(action: any): Generator<any, void, any> {
     yield fork(watchDiaryEntries, action.payload);
   }
-  
-
 
 export function* diarySaga() {
-    yield takeLatest("diary/addEntry", addDiarySaga);
-    yield takeLatest("diary/getEntry", getDiarySaga);
+    yield takeLatest(addEntry, addDiarySaga);
+    yield takeLatest(getEntry, getDiarySaga);
 }

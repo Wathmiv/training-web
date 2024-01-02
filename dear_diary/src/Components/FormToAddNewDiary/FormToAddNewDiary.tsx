@@ -1,14 +1,15 @@
-import { TextField,Button,CardHeader } from "@mui/material";
-import { toast, ToastContainer } from 'react-toastify';
+import { TextField,Button,CardHeader} from "@mui/material";
+import { toast } from 'react-toastify';
 import IconButton from '@mui/material/IconButton';
 import Avatar from '@mui/material/Avatar';
-import Icon from "../../Public/Icons.png";
 import 'react-toastify/dist/ReactToastify.css';
 import { useDispatch, useSelector } from "react-redux";
 import { addEntry,updateCurrentEntry,clearCurrentEntry } from "../../redux/slices/diaryReducer";
 import { RootState } from "../../redux/store";
-import { useEffect } from "react";
-
+import { useEffect} from "react";
+import TimeAgo from "../TimeAgo/TimeAgo";
+import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
 
 interface FormToAddNewDiaryProps {
     onCloseOverlay: () => void;
@@ -19,33 +20,94 @@ function FormToAddNewDiary({ onCloseOverlay}: FormToAddNewDiaryProps){
     const dispatch = useDispatch();
     const currentEntry= useSelector((state:RootState)=> state.diary.currentEntry);
     const name= useSelector((state:RootState)=> state.user.nickname);
-
-        useEffect(() => {
-            const key = "user";
-            dispatch(updateCurrentEntry({[key]:name}));
-        },[name] );
-      
-        const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            const { name, value } = e.target;
-            dispatch(updateCurrentEntry({[name]:value}));
-       
-        };
+  
+    useEffect(() => {
+        const key = "user";
+        dispatch(updateCurrentEntry({[key]:name}));
+    },[name] );
+    
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        dispatch(updateCurrentEntry({[name]:value}));
+    };
       
         const handleSubmit = () => {
-            if (!currentEntry.title || !currentEntry.description){
-                toast.error("Title and Description are required");
+            if (!currentEntry.title.trim() || !currentEntry.description.trim()){
+                toast.error("Title and Description are required",{autoClose: 2000});
             }
             else{
-                // const key = "user";
-                // dispatch(updateCurrentEntry({[key]:name}));
+               
                 dispatch(addEntry(currentEntry));
-                
-                dispatch(clearCurrentEntry());
+                toast(
+                    <div style={{ 
+                        display: "flex",
+                        flexDirection: "row",
+                        height: "24px",
+                        gap: "8px",
+                        justifyContent: "space-between",
+                                                
+                        }}>
+                            
+                      <div style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        }}>
+                        <CheckIcon
+                        style={{
+                            width: "24px",
+                            height: "24px",
+                            color : "#28C76F",
+                        }}  
+                        />
+                        </div>
 
+                        <span
+                        style={{
+                            width:"274px",
+                            color: "var(--light-typography-color-heading-text, #4B465C)",
+                            fontFamily: "Public Sans, sans-serif",
+                            fontSize: "15px",
+                            fontWeight: 600,
+                            fontStyle: "normal",
+                            lineHeight: "22px",
+                            fontFeatureSettings: "'clig' off, 'liga' off",
+                        }}
+                        >
+                       Record saved successfully
+                      </span>
+                      
+                    <div
+                     style={{
+                        color: "var(--Light-Typography-Color-Muted-Text, #4B465C)",
+                        fontFamily: "Public Sans, sans-serif",
+                        fontSize: "13px",
+                        fontWeight: 400,
+                        fontStyle: "normal",
+                        lineHeight: "20px",
+                        fontFeatureSettings: "'clig' off, 'liga' off",
+                        textAlign: "right",
+                     }}
+                    >
+                      <TimeAgo date={new Date()} />
+                    </div>
+                    <CloseIcon
+                    style={{
+                        width: "16px",
+                        height: "16px",
+                        color: "var(--Light-Typography-Color-Muted-Text, #4B465C)",
+                    }}
+                    />
+                    </div>
+                    
+                  );
+                dispatch(clearCurrentEntry());
                 onCloseOverlay();
             }
+        };
 
-      
+        const handleCancel = () => {
+            dispatch(clearCurrentEntry());
+            onCloseOverlay();
         };
       
     
@@ -53,7 +115,7 @@ function FormToAddNewDiary({ onCloseOverlay}: FormToAddNewDiaryProps){
         
         <div className="form-div"
         style={{
-            width: "400px",
+            maxWidth: "500px",
             height: "100%",
             position: "relative",
             right: "0px",
@@ -71,13 +133,18 @@ function FormToAddNewDiary({ onCloseOverlay}: FormToAddNewDiaryProps){
                 alignItems: "center",
             }}
             >
-            <div
-                style={{
-                    width: "100%",
-                }}
-                >
+            
             <CardHeader
                 title={
+                    <div
+                    style={{
+                        display:"flex",
+                        flexDirection:"row",
+                        justifyContent:"space-between",
+                        maxWidth:"352px",
+                        alignItems: "center"
+                    }}
+                    >
                     <div 
                         className="heading-div"
                         style={{
@@ -91,9 +158,15 @@ function FormToAddNewDiary({ onCloseOverlay}: FormToAddNewDiaryProps){
 
                         Submit New
                     </div>
-                }
-                action={
-                    <IconButton aria-label="close">
+                    <div>
+                    <IconButton aria-label="close"
+                    onClick={handleCancel}
+                    sx={{
+                        '&:hover': {
+                          backgroundColor: 'transparent', 
+                        },
+                      }}
+                    >
                         <div
                         style={{
                             display: "flex",
@@ -104,7 +177,7 @@ function FormToAddNewDiary({ onCloseOverlay}: FormToAddNewDiaryProps){
                         }}  
                         >
                             <Avatar 
-                                src={Icon} 
+                                src="/Icons.png"
                                 alt="icon" 
                                 style={{
                                     width: "24px",
@@ -112,11 +185,13 @@ function FormToAddNewDiary({ onCloseOverlay}: FormToAddNewDiaryProps){
                                     padding: "7px",
                                 }}
                                 />
-
                         </div>
                     
                     </IconButton>
+                    </div>
+                </div>
                 }
+                 
                 sx={{
                     display: 'flex',
                     justifyContent: 'space-between',
@@ -129,8 +204,7 @@ function FormToAddNewDiary({ onCloseOverlay}: FormToAddNewDiaryProps){
                     alignItems: "center",
                     justifyContent:"space-between"
                 }}
-    />
-            </div>
+            />
 
             <form
             style={{
@@ -167,9 +241,13 @@ function FormToAddNewDiary({ onCloseOverlay}: FormToAddNewDiaryProps){
                     placeholder="Title"
                     style={{
                         width: "100%",
-                        
-
                     }}
+                    inputProps={{
+                        style: {
+                          height: "24px",
+                          padding: "7px 14px", 
+                        },
+                      }}
                     name="title"
                     value={currentEntry.title}
                     onChange={handleChange}
@@ -198,12 +276,17 @@ function FormToAddNewDiary({ onCloseOverlay}: FormToAddNewDiaryProps){
                     Description
                 </div>
             <TextField
-                placeholder="Write your diary here"
+                placeholder="Description"
                 style={{
                     width: "100%",
                 }}
+                inputProps={{
+                    style: {
+                        maxWidth: "100%",
+                    },
+                  }}
                 multiline
-                rows={6} 
+                rows={8} 
                 variant="outlined"
                 name="description"
                 value={currentEntry.description}
@@ -255,7 +338,7 @@ function FormToAddNewDiary({ onCloseOverlay}: FormToAddNewDiaryProps){
                     type="button"
                     variant="contained"
                     className="cancelButton"
-                    onClick={onCloseOverlay}
+                    onClick={handleCancel}
                     style={{
                         textTransform: "none",
                         borderRadius: "6px",
@@ -283,13 +366,9 @@ function FormToAddNewDiary({ onCloseOverlay}: FormToAddNewDiaryProps){
                 >
                 Cancel
                 </div>
-                </Button>
-
-                <ToastContainer
-                autoClose={false}
-                />
-        </div>
-        </div>
+                </Button>                              
+             </div>
+         </div>
         </div>
 
         

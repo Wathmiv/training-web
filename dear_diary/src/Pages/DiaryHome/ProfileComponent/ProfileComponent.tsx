@@ -1,5 +1,4 @@
 import Box from '@mui/material/Box';
-import ProfileIcon from "./Avatar.png"
 import { useSelector } from "react-redux";
 import { RootState } from "../../../redux/store";
 import { useEffect } from 'react';
@@ -22,7 +21,6 @@ function ProfileComponent(){
               } catch (error) {
                 console.error("Error loading user state from localStorage:", error);
               }
-            
         }
     },[]);
 
@@ -30,10 +28,7 @@ function ProfileComponent(){
         <div 
         className="profile"
         style={{
-            position: "absolute",
-            top: "60px",
-            right: "60px",
-            display: "inline-flex",
+            display: "flex",
             flexDirection: "column",
             alignItems: "center",
             gap: "4px",
@@ -51,12 +46,12 @@ function ProfileComponent(){
             >
                 <Box>
                     <img 
-                    src={ProfileIcon} 
+                    src="/Avatar.png" 
                     alt="icon" 
                     className="profile-icon"
                     style={{
-                        width: "72px",
-                        height: "72px",
+                        maxWidth: "72px",
+                        maxHeight: "72px",
                         borderRadius: "100px",
                     }}
                     />

@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
-import { Card,CardContent,CardHeader, TextField, Button,Typography} from "@mui/material";
+import { Card,CardContent,CardHeader, TextField, Button,Typography, Grid, Box} from "@mui/material";
 import Avatar from "@mui/material/Avatar";
-import Logo from "../../Public/Logo.png";
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
@@ -10,40 +9,40 @@ import { ArrowForward } from "@mui/icons-material";
 import { useState } from "react";
 import randomNickname from "../../utility/randomNickname";
 import LayoutBackground from "../../Components/LayoutBackground/LayoutBackground";
-import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../redux/store";
 import { setNickname } from "../../redux/slices/userSlice";
 import { useNavigate } from "react-router-dom";
-
+import { toast } from "react-toastify";
+import { clearEntries } from "../../redux/slices/diaryReducer";
+import { Diary_Home_PATH } from "../../utility/constants";
 
 function SignInPage() {
   const history = useNavigate()
   const dispatch = useDispatch();
-  const nickname = useSelector((state: RootState) => state.user.nickname);
-  const user = useSelector((state: RootState)=> state.user);
   const [random, setRandom] = useState("")
   
-  
-
   const handleRandomButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     setRandom(randomNickname());     
   };
 
+  useEffect(() => {
+    return () => {
+      dispatch(clearEntries());
+    };
+  }, [dispatch]);
+
   const handleContinueButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-      if (random !== ""){
+      if (random.trim() !== ""){
         dispatch(setNickname(random));
+        toast.success("Login Successful!",{autoClose: 2000});
       try{
         localStorage.setItem("userState", JSON.stringify({nickname:random}));
       } catch (error) {
         console.error("Error saving user state to localStorage:", error);
       }
-      history("/diary-home");
-      }
-
-      
+      history(Diary_Home_PATH);
+      }    
   };
-
 
   return (
     <LayoutBackground>
@@ -57,13 +56,16 @@ function SignInPage() {
     >
       <Card 
       style={{
-        width: "742px",
+        maxWidth: "742px",
         alignSelf: "center",
-        borderRadius: "6px"}}
+        borderRadius: "6px",
+        boxShadow: "0px 4px 18px 0px rgba(75, 70, 92, 0.10)"
+      }}
       >
       <CardHeader 
+
       title={
-        <Typography variant="h5" 
+        <Typography 
         style={{
           fontFamily: "public sans, sans-serif",
           fontSize: "24px",
@@ -76,10 +78,13 @@ function SignInPage() {
         </Typography>
       } 
       style={{
-        padding: "24px 24px 0px 24px",
-        gap: "12px"
+         display: "flex",
+          padding: "24px 24px 0px 24px",
+          alignItems: "center",
+          gap: "12px",
+          alignSelf: "stretch",
       }}
-      avatar={<Avatar alt="Logo" src={Logo} style={{width: "40px",
+      avatar={<Avatar alt="Logo" src="/Logo.png" style={{width: "40px",
         height: "40px"}}/>}
       >
       </CardHeader>
@@ -91,7 +96,7 @@ function SignInPage() {
       >
       <div 
       style={{
-        width: "694px",
+        maxWidth: "694px",
         display: "flex",
         flexDirection: "column",
         gap: "24px"
@@ -99,12 +104,10 @@ function SignInPage() {
       >
         <div className="frame1"
         style={{
-          width: "694px",
-          height: "39px"
+          minHeight: "39px"
         }}
         >
         <Typography
-              variant="h5"
               className="sign_in_text "
               style={{
                 fontFamily: 'Public Sans, sans-serif',
@@ -121,7 +124,7 @@ function SignInPage() {
         </div>  
         <div className="frame2"
         style={{
-          width: "694px",
+          maxWidth: "614px",
           display: "flex",
           flexDirection: "column",
           gap: "16px",
@@ -131,40 +134,58 @@ function SignInPage() {
         >
           <div className="formContainer"
           style={{
-            width: "515px",
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "center",
-            gap: "16px"
+            gap: "16px",
+            maxWidth:"100%",  
           }}
+          
           >
-            <div className="frame3">
-              <TextField
-                label="Your Nickname*"
-                variant="outlined"
-                fullWidth
-                size="small"
-                className="nameInput"
+            <Grid 
+            container direction="row" 
+            alignItems="center" 
+            justifyContent="center" 
+            sx={{ gap: '16px',
+            }}>
+              <Grid item >
+                <div
                 style={{
-                  width: "395px",
-                  color: "#DBDADE",
-                  border: "1px",
-                  borderColor: "#DBDADE",
-                  borderRadius: "4px",
-                  padding: "7px, 10px, 7px, 10px"
-
+                  maxWidth: "395px",
                 }}
-                value = {random} //set the value of the input to the random state
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRandom(e.target.value)}//set the random state to the value of the input
+                >
+              
+                  <TextField
+                  placeholder="Your Nickname*"
+                  fullWidth
+                  size="small"
+                  sx={{
+                    color: "#DBDADE",
+                    border: "1px",
+                    borderColor: "#DBDADE",
+                    borderRadius: "4px",
+                    padding: "7px, 10px, 7px, 10px",
+                    width: "395px",
+                    maxWidth: "100%",
+                    '@media (max-width: 395px)': {
+                      width: '100%', 
+                    },
+                  }}
+                  value = {random} //set the value of the input to the random state
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRandom(e.target.value)}//set the random state to the value of the input
 
-              />
-              </div>
-              <Button 
+                  />
+                </div>
+            </Grid>
+        <Grid item  justifyContent="center">
+              
+            <Button 
               type="button" 
               variant="contained"
               className="submitButton"
               style={{
+                textTransform: "none",
                 padding: "10px, 20px",
                 background: '#0092DD29',
                 color: '#0092DD',
@@ -173,10 +194,10 @@ function SignInPage() {
               >
                 Random
               </Button>
-              
-              </div>
+              </Grid>
+            </Grid>
+           </div>
             
-          
           <div className="continue"
           style={{
             width: "614px",
@@ -184,7 +205,6 @@ function SignInPage() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            margin: "24px"
           }}
           >
           <Button 
@@ -193,7 +213,9 @@ function SignInPage() {
             className="secondButton"
             
             style={{
-              backgroundColor: "#0092DD",
+              textTransform: "none",
+              backgroundColor:"#0092DD",
+              opacity: random.trim() === "" ? "65%" : "",
             }}
             endIcon={<ArrowForward />}
             onClick={handleContinueButtonClick}

@@ -1,4 +1,4 @@
-import { Button, Drawer, TextField, Grid } from "@mui/material";
+import { Button, Drawer, TextField, Alert} from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import InputAdornment from '@mui/material/InputAdornment';
 import {ChangeEvent, useEffect, useState } from "react";
@@ -8,25 +8,32 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../../redux/store";
 import { useDispatch } from "react-redux";
 import { getEntry } from "../../../redux/slices/diaryReducer";
+import { Masonry } from '@mui/lab';
+import { addEntry,updateCurrentEntry,clearCurrentEntry } from "../../../redux/slices/diaryReducer";
 
 
 function SearchBar(){
   const dispatch = useDispatch();
+  const [searchActive, setSearchActive] = useState(false);
   const [showOverlay, setShowOverlay] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const diaryEntries = useSelector((state:RootState) => state.diary.entries);
   const user = useSelector((state:RootState) => state.user.nickname);
 
+  const isSurfaceDuo = window.matchMedia('(max-width: 540px)').matches;
+
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
+    if (event.target.value !== '') {
+      setSearchActive(true);
+    } else {
+      setSearchActive(false);
+    }
   };
-
+ 
   const filteredEntries = diaryEntries.filter(entry =>
-    entry.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    entry.description.toLowerCase().includes(searchTerm.toLowerCase())
+    entry.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  
 
   useEffect(()=>{
     dispatch(getEntry(user));
@@ -37,6 +44,7 @@ function SearchBar(){
   };
 
   const handleCloseOverlay = () => {
+    dispatch(clearCurrentEntry());
     setShowOverlay(false);
   };
 
@@ -77,23 +85,36 @@ function SearchBar(){
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
+              gap: "16px",
             
             }}
             >
                 <TextField
-                    placeholder="Placeholder"
+                    placeholder="Search"
                     className="search-bar"
-                    style={{
+                    sx={{
                       width: "530px",
+                      maxWidth: "100%",
                       borderRadius: "8px",
                       border: "1px solid #DBDADE",
                       backgroundColor: "#FFFFFF",
-                      padding: "0px"
+                      '@media (max-width: 530px)': {
+                        width: '100%', 
+                      },
                     }}
                     value={searchTerm}
                     onChange={handleSearchChange}
                     InputProps={{
-                        
+                      style :{
+                        padding: "13px 16px 13px 16px",
+                        height: "48px",
+                        display: "flex",
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: "8px",
+
+                      },
+                      
                         startAdornment: (
                           <InputAdornment 
                             position="start"
@@ -101,11 +122,7 @@ function SearchBar(){
                             style={{
                               width: "22px",
                               height: "22px",
-                              display: "flex",
-                              flexDirection: "row",
-                              alignItems: "center",
-                              gap: "8px",
-                              padding: "13px 16px"
+                             
                             }}
                           >
                             <SearchIcon 
@@ -135,6 +152,7 @@ function SearchBar(){
                     className="button"
                     onClick={handleButtonClick}
                     style={{
+                      height: "48px",
                         padding: "13px, 26px",
                         borderRadius: "8px",
                         background: "#0092DD",
@@ -145,7 +163,8 @@ function SearchBar(){
                         fontStyle: "normal",
                         lineHeight: "22px",
                         letterSpacing: "0.43px",
-                        textTransform: "none"
+                        textTransform: "none",
+                        boxShadow: 'none'
                       }}
                     >    
                     Submit new
@@ -160,14 +179,28 @@ function SearchBar(){
               <FormToAddNewDiary onCloseOverlay={handleCloseOverlay} />
               
             </Drawer>   
-            <Grid container spacing={2}>
-        {filteredEntries.map((entry, index) => (
-          <Grid item key={index}>
-            <DiaryCard title={entry.title} description={entry.description} />
-          </Grid>
-        ))}
-      </Grid>
-     
+
+            {searchActive && filteredEntries.length === 0 && <p>No entries found.</p>}
+
+           <div
+           style={{
+           }}
+           >
+           <Masonry columns={isSurfaceDuo ? 1 : {xs:1, sm:3, md:4, lg:6}}  spacing={2} sx={{ 
+            width:"auto",
+            '@media (max-width: 540px)': {
+              width: '100%',
+              rowGap:"2"
+            },
+              '@media (max-width: 480px)': {
+                width: 'auto',
+            }            
+          }} >
+           {filteredEntries.map((entry, index) => (
+             <DiaryCard title={entry.title} description={entry.description} />
+             ))}
+         </Masonry>
+           </div>    
         </div>
     );
 }

@@ -23,8 +23,8 @@ function DiaryCard({title, description}: CustomCardProps){
         sx={{
             display: "flex",
             flexDirection: "column",
-            width: "271px",
             alignItems: "flex-start",
+            maxWidth: "100%",
             borderRadius: "6px",
             boxShadow: "0px 4px 18px 0px rgba(75, 70, 92, 0.10)",
 
@@ -38,6 +38,9 @@ function DiaryCard({title, description}: CustomCardProps){
                 <Typography
                 component={'div'}
                 sx={{
+                    overflowWrap: 'break-word',
+                    wordBreak: 'break-all',
+                    wordWrap: 'break-word',
                     display: "flex",
                     paddingBottom: "6px",
                     alignItems: "flex-start",
@@ -57,6 +60,8 @@ function DiaryCard({title, description}: CustomCardProps){
                 <Typography
                 component={'div'}
                 sx={{
+                    overflowWrap: 'break-word',
+                    wordBreak: 'break-all',
                     display: "flex",
                     paddingBottom: "16px",
                     alignItems: "flex-start",

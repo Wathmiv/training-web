@@ -1,5 +1,5 @@
-import Logo from "../../../Public/Logo.png";
 import Box from '@mui/material/Box';
+import ProfileComponent from "../ProfileComponent/ProfileComponent";
 
 function HeaderComponent() {
   return (
@@ -7,18 +7,26 @@ function HeaderComponent() {
       style={{
         position: "absolute",
         top: "60px",
-        left: "36px",
-        right: "1142px",
-        bottom: "932px",
-        padding: "24px",
-        width: "742px",
+        left: "60px",
+        right:"60px",
+        // padding: "24px",
         display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        gap: "12px",
+        justifyContent: "space-between",
+      }}
+    >
+      <div
+      style={{
+        display: "flex",
+        flexDirection: "row",
         alignItems: "center",
         gap: "12px",
       }}
-    >
+      >
       <Box>
-      <img src={Logo} alt="icon" className="logo" />
+      <img src="/Logo.png" alt="icon" className="logo" />
       </Box>
 
       <div className="title"
@@ -35,7 +43,8 @@ function HeaderComponent() {
       >
         Dear Diary
       </div>
-      
+      </div>
+      <ProfileComponent/>
     </div>
   );
 }
